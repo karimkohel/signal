@@ -1,5 +1,6 @@
 import cv2
 import mediapipe as mp
+import numpy as np
 
 mpHolistics = mp.solutions.holistic
 mpDrawing = mp.solutions.drawing_utils
@@ -17,6 +18,12 @@ def drawLandmarks(img, results):
     mpDrawing.draw_landmarks(img, results.left_hand_landmarks, mpHolistics.HAND_CONNECTIONS)
     mpDrawing.draw_landmarks(img, results.right_hand_landmarks, mpHolistics.HAND_CONNECTIONS)
 
+def getKeyPoints(result):
+    face = np.array([[res.x, res.y, res.z] for res in result.face_landmarks.landmark]).flatten() if result.face_landmarks else np.zeros(1404)
+    leftHandLandMarks = np.array([[res.x, res.y, res.z] for res in result.left_hand_landmarks.landmark]).flatten() if result.left_hand_landmarks else np.zeros(21*3)
+    rightHandLandMarks = np.array([[res.x, res.y, res.z] for res in result.right_hand_landmarks.landmark]).flatten() if result.right_hand_landmarks else np.zeros(21*3)
+    pose = np.array([[res.x, res.y, res.z, res.visibility] for res in result.pose_landmarks.landmark]).flatten()if result.pose_landmarks else np.zeros(132)
+    return np.concatenate([face, leftHandLandMarks, rightHandLandMarks, pose])
 
 
 cap = cv2.VideoCapture(0)
@@ -27,6 +34,9 @@ with mpHolistics.Holistic(min_detection_confidence=0.5, min_tracking_confidence=
         _, frame = cap.read()
 
         result = mediapipeDetection(frame, holistic)
+
+
+
 
         drawLandmarks(frame, result)
         cv2.imshow("frame", frame)
