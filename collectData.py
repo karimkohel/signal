@@ -22,16 +22,17 @@ def getKeyPoints(result):
     pose = np.array([[res.x, res.y, res.z, res.visibility] for res in result.pose_landmarks.landmark]).flatten()if result.pose_landmarks else np.zeros(132)
     return np.concatenate([face, leftHandLandMarks, rightHandLandMarks, pose])
 
+def drawLandmarks(img, results):
+    mpDrawing.draw_landmarks(img, results.face_landmarks, mpHolistics.FACEMESH_TESSELATION)
+    mpDrawing.draw_landmarks(img, results.pose_landmarks, mpHolistics.POSE_CONNECTIONS)
+    mpDrawing.draw_landmarks(img, results.left_hand_landmarks, mpHolistics.HAND_CONNECTIONS)
+    mpDrawing.draw_landmarks(img, results.right_hand_landmarks, mpHolistics.HAND_CONNECTIONS)
+    
+mpHolistics = mp.solutions.holistic
+mpDrawing = mp.solutions.drawing_utils
 if __name__ == "__main__":
 
-    mpHolistics = mp.solutions.holistic
-    mpDrawing = mp.solutions.drawing_utils
 
-    def drawLandmarks(img, results):
-        mpDrawing.draw_landmarks(img, results.face_landmarks, mpHolistics.FACEMESH_TESSELATION)
-        mpDrawing.draw_landmarks(img, results.pose_landmarks, mpHolistics.POSE_CONNECTIONS)
-        mpDrawing.draw_landmarks(img, results.left_hand_landmarks, mpHolistics.HAND_CONNECTIONS)
-        mpDrawing.draw_landmarks(img, results.right_hand_landmarks, mpHolistics.HAND_CONNECTIONS)
 
     for action in actions:
         for sequence in range(noSequences):

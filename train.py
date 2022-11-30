@@ -8,7 +8,19 @@ from collectData import actions, noSequences, sequenceLen, dataPath
 import numpy as np
 
 
-### Pre Processing
+def getModel():
+    model = Sequential()
+    model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30,1662)))
+    model.add(LSTM(128, return_sequences=True, activation='relu'))
+    model.add(LSTM(64, return_sequences=False, activation='relu'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(32, activation='relu'))
+    model.add(Dense(actions.shape[0], activation='softmax'))
+
+    model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
+
+    return model
+
 labelMap = {label:num for num, label in enumerate(actions)}
 sequences, labels = [], []
 for action in actions:
@@ -24,25 +36,22 @@ X = np.array(sequences)
 y = to_categorical(labels).astype(int)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.05)
 
-### INITS
-log_dir = os.path.join('Logs')
-tb_callback = TensorBoard(log_dir=log_dir)
+if __name__ == "__main__":
+
+    ### Pre Processing
+
+    ### INITS
+    log_dir = os.path.join('Logs')
+    tb_callback = TensorBoard(log_dir=log_dir)
 
 
 
-### Network
-model = Sequential()
-model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30,1662)))
-model.add(LSTM(128, return_sequences=True, activation='relu'))
-model.add(LSTM(64, return_sequences=False, activation='relu'))
-model.add(Dense(64, activation='relu'))
-model.add(Dense(32, activation='relu'))
-model.add(Dense(actions.shape[0], activation='softmax'))
+    ### Network
 
-model.compile(optimizer='Adam', loss='categorical_crossentropy', metrics=['categorical_accuracy'])
+    model = getModel()
 
-model.fit(X_train, y_train, epochs=220, callbacks=[tb_callback])
+    model.fit(X_train, y_train, epochs=260, callbacks=[tb_callback])
 
-model.save("model.h5")
+    model.save("model.h5")
 
-print(model.summary())
+    print(model.summary())
