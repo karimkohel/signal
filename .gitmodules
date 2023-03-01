@@ -1,0 +1,3 @@
+[submodule "ActuatorHTI"]
+	path = ActuatorHTI
+	url = https://github.com/karimkohel/ActuatorHTI
